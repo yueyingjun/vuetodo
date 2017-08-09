@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue.js"></script>
+    <style>
+        ul,li{
+            padding:0;margin:0;list-style: none;
+        }
+        .done{
+            display: inline-block;
+            width:10px;height:10px;
+            border:1px solid #ccc;
+            border-radius: 50%;
+        }
+        .red{
+            background: red;
+        }
+    </style>
+</head>
+<body>
+
+        <div class="container">
+
+            <input type="text" v-model="con" @keydown.13="add()"><br>
+            <div class="con">
+                <ul v-show="state=='all'">
+                    <li v-for="item in all">
+                        <span class="done" @click="success(item.id,'all')" :class="{red:item.status=='done'}">
+
+                        </span>
+                        <span>
+                                {{item.con}}
+                        </span>
+                        <span @click="del(item.id)">删除</span>
+                    </li>
+                </ul>
+
+
+                <ul v-show="state=='done'">
+
+                <li v-for="item in done">
+
+                        <span class="done" @click="success(item.id,'done')" :class="{red:item.status=='done'}">
+
+                        </span>
+                    <span>
+                         {{item.con}}
+                        </span>
+                    <span @click="del(item.id)">删除</span>
+                </li>
+            </ul>
+
+                <ul v-show="state=='undo'">
+
+                    <li v-for="item in undo">
+                        <span class="done" @click="success(item.id,'undo')" :class="{red:item.status=='done'}">
+
+                        </span>
+                        <span>
+                            {{item.con}}
+                        </span>
+                        <span @click="del(item.id)">删除</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="opt">
+                <input type="button" value="全部" @click="change('all')">
+                <input type="button" value="已完成" @click="change('done')">
+                <input type="button" value="未完成" @click="change('undo')">
+            </div>
+        </div>
+
+        <script>
+
+
+            /*
+            *
+            *    麻烦
+            *
+            *    数据
+            *    //传值
+            *
+            *    all  [1,2,3,4]
+            *    done [2,3]
+            *    undo [4,1]
+            *
+            * */
+            new Vue({
+                el:".container",
+                data:{
+                    all:[],
+                    done:[],
+                    undo:[],
+                    state:"all",
+                    con:""
+                },
+                methods:{
+
+                    change:function(state){
+                        this.state=state;
+                    },
+                    add(){
+                        var obj={};
+                        obj.id=new Date().getTime()+Math.random()*1000;
+                        obj.con=this.con;
+                        obj.status="all";
+                        this.all.push(obj);
+                        this.undo.push(obj);
+                        this.con="";
+                    },
+
+                    success:function(id,state){
+                        if(state=="all"){
+                            this.undo=this.undo.filter(function(val){
+                                if( val.id!=id){
+                                    return val;
+                                }
+
+                            })
+
+                           var arr= this.all.filter(function(val){
+                               if(val.id==id) {
+                                   val.status = "done"
+                                   return val;
+                               }
+
+                            });
+
+                            this.done.push(arr[0]);
+                        }
+
+                        if(state=="done"){
+
+                            this.done=this.done.filter(function(val){
+                                if(val.id!=id){
+
+                                   return val;
+                                }
+
+                            })
+
+
+                            //未完成
+
+                            var arr=this.all.filter(function(val){
+                                if(val.id==id){
+                                    val.status="undo";
+                                    return val;
+                                }
+
+                            });
+
+                            this.undo.push(arr[0]);
+
+
+
+
+                        }
+
+                        if(state=="undo"){
+
+                            this.undo=this.undo.filter(function(val){
+                                if(val.id!=id){
+                                    return val;
+                                }
+
+                            })
+
+                           var arr= this.all.filter(function(val){
+                                if(val.id==id){
+                                    val.status="done"
+                                    return val;
+                                }
+
+                            })
+
+                            this.done.push(arr[0]);
+
+                        }
+
+
+
+                    },
+
+                    del:function(id){
+
+                        this.all=this.all.filter(function(val){
+                            if(val.id!=id){
+                                return val
+                            }
+
+                        })
+
+                        this.done=this.done.filter(function(val){
+                            if(val.id!=id){
+                                return val
+                            }
+
+                        })
+
+                        this.undo=this.undo.filter(function(val){
+                            if(val.id!=id){
+                                return val
+                            }
+
+                        })
+                    }
+                }
+
+            })
+        </script>
+</body>
+</html>

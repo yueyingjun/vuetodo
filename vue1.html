@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue.js"></script>
+    <style>
+        ul,li{
+            padding:0;margin:0;list-style: none;
+        }
+        .done{
+            display: inline-block;
+            width:10px;height:10px;
+            border:1px solid #ccc;
+            border-radius: 50%;
+        }
+        .red{
+            background: red;
+        }
+
+        /*
+
+
+         v-for="item in data"
+
+
+           var data=[
+              {id:1,con:"232",state:"2"},
+              {id:2,con:"232",state:"2"},
+              {id:3,con:"232",state:"0"},
+              {id:4,con:"232",state:"0"},
+              {id:5,con:"232",state:"0"},
+              {id:6,con:"232",state:"0"},
+              {id:7,con:"232",state:"0"},
+           ]
+
+
+
+           每一个信息： 完成 1 未完成 2
+           整体状态： 已完成  1 未完成 2
+        */
+    </style>
+</head>
+<body>
+        <div class="container">
+
+            <input type="text" v-model="con" @keydown.13="add()"><br>
+            <div class="con">
+                <ul>
+                    <li v-for="item in data">
+                        <span class="done" @click="success(item.id)" :class="{red:item.status=='done'}">
+                        </span>
+                        <span>
+                                {{item.con}}
+                        </span>
+                        <span @click="del(item.id)">删除</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="opt">
+                <input type="button" value="全部" @click="change('all')">
+                <input type="button" value="已完成" @click="change('done')">
+                <input type="button" value="未完成" @click="change('undo')">
+            </div>
+        </div>
+
+        <script>
+
+        new Vue({
+            el:".container",
+            data:{
+                arr:[],
+                state:"all",
+                con:""
+            },
+            methods:{
+
+                change(state){
+                    this.state=state;
+                },
+                add(){
+                    var obj={};
+                    obj.id=new Date().getTime()+Math.random()*1000;
+                    obj.con=this.con;
+                    obj.status="all";
+                    this.arr.push(obj);
+                   this.con="";
+                },
+                success(id){
+                  this.arr.filter(function(val){
+                       if(val.id==id){
+                           if(val.status=="done"){
+                               val.status="undo"
+                           }else{
+                               val.status="done";
+                           }
+                       }
+                   })
+
+
+
+                },
+
+                del:function(id){
+                    this.arr=this.arr.filter(function(val){
+                        if(val.id!=id){
+                            return val;
+                        }
+                    })
+                }
+            },
+
+            computed:{
+                data:function(){
+                    var that=this;
+                   return this.arr.filter(function(val){
+                            if(that.state=="all"){
+                                return val;
+                            }else{
+                                if(that.state==val.status){
+                                    return val;
+                                }
+                            }
+                    })
+                }
+            }
+        })
+
+
+        </script>
+</body>
+</html>
